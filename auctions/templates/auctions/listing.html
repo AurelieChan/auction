@@ -1,0 +1,169 @@
+{% extends "auctions/layout.html" %}
+
+{% block title %}
+  Oldiction | {{ title }}
+{% endblock %}
+
+{% block body %}
+  <script>
+    $(document).ready(function(){
+      $("#click-icon").click(function(){
+
+        // get the value of CSRF token
+        var CSRFtoken = $('input[name=csrfmiddlewaretoken]').val();
+        if (!$("#icon").hasClass("blue"))
+          if ($("#icon").hasClass("far")) {
+            $("#icon").addClass("fas").removeClass("far");
+            $("#text").text("Remove from watchlist");
+          }
+          else {
+            $("#icon").addClass("far").removeClass("fas");
+            $("#text").text("Add to watchlist");
+          }
+          $.post( "{% url 'watching' %}", {
+            csrfmiddlewaretoken: CSRFtoken,
+            listing: {{ listing_id }}
+        });
+      });
+    });
+  </script>
+
+  <h2>Listing</h2>
+
+  <div class="spacing-startblock"></div>
+
+  <div class="funky-border">
+
+    <div class="listing-container">
+      <div>
+        <h3>
+          {{ title }}
+
+          {% if user.is_authenticated %}
+
+            <span id='click-icon'>
+            {% csrf_token %}
+
+            {% if winner and winner == user %}
+              <i id='icon' class='fas fa-star mytooltip'><span id='text' class="tooltiptext">You won this listing!</span></i>
+
+            {% else %}
+              {% if createdByUser %}
+                <i id='icon' class='fas fa-heart mytooltip blue'><span id='text' class="tooltiptext">You created this listing</span></i>
+              {% elif watching %}
+                <i id='icon' class='fas fa-heart mytooltip'><span id='text' class="tooltiptext">Remove from watchlist</span></i>
+              {% else %}
+                <i id='icon' class='far fa-heart mytooltip'><span id='text' class="tooltiptext">Add to watchlist</span></i>
+              {% endif %}
+
+            {% endif %}
+            </span>
+
+          {% else %}
+
+            <i class='far fa-heart mytooltip'>
+              <span class="tooltiptext">You must REGISTER or SIGN IN to add this item to your watchlist.</span>
+            </i>
+
+          {% endif %}
+
+        </h3>
+
+        <p>{{ description }}</p>
+        <br>
+        <p><b class="mini-titles">Category:</b> {{ category }} &#127804; <b class="mini-titles">Posted by:</b> {{ owner }} </p>
+        <p><b class="mini-titles">Current price: </b>US ${{ bid }} ({{ bid_count_sentence }})</p>
+
+        {% if user.is_authenticated %}
+
+          {% if winner %}
+
+            {% if createdByUser %}
+              <p class="closed_bid_message">You sucessfully closed the auction.</p>
+            {% elif winner == user %}
+              <p class="closed_bid_message">Congratulations, you won this auction!</p>
+            {% else %}
+              <p class="closed_bid_message">This auction is closed.</p>
+
+            {% endif %}
+
+          {% else %}
+
+            {% if createdByUser %}
+              <p>
+                <i>The original price was <b style="color:#660033">${{ original_price }}</b>.</i>
+                {% if bid_count < 1 %}
+                  <div class="mytooltip">
+                    <button class="transparent-button">Close Auction</button>
+                    <span id='text' class="tooltiptext" style="margin-top: 0px;">
+                      There must be at least one bid to close the auction.
+                    </span>
+                  </div>
+                {% else %}
+                  <form method="POST" action="{% url 'closing' listing_id=listing_id %}">
+                    {% csrf_token %}
+                    <button type="submit">Close Auction</button>
+                  </form>
+                {% endif %}
+              </p>
+
+            {% else %}
+              <form method="POST" action="{% url 'bidding' listing_id=listing_id %}">
+                {% csrf_token %}
+                {{ listing_form.non_field_errors }}
+                {{ bid_form.amount.errors }}
+                <p class="bid"><b class="usdollar">US $</b>
+                  {{ bid_form.amount }}
+                </p>
+                  <button class="bid-button" type="submit">Place bid</button>
+              </form>
+            {% endif %}
+
+          {% endif %}
+
+        {% endif %}
+
+      </div>
+
+      <div>
+        {% if picture %}
+          <img src="{{ picture }}" class="imgListing">
+        {% endif %}
+      </div>
+
+      <div class="comments-section">
+
+        <p class="mini-titles" style="margin-left: 10px;">COMMENTS SECTION</p>
+
+        {% if user.is_authenticated %}
+
+          <form method="POST" action="{% url 'commenting' listing_id=listing_id %}">
+            {% csrf_token %}
+            {{ comment_form }}
+            <div>
+              <button class="comment-button" type="submit">Post your comment</button>
+            </div>
+          </form>
+
+        {% endif %}
+
+        <div>
+          {% for comment in comments_list %}
+
+            <div class="single-comment-box">
+              <p><b class="mini-titles">{{ comment.user }} commented:</b> {{ comment.comment }}</p>
+            </div>
+
+          {% empty %}
+
+            <p style="margin-left: 10px">No comment yet.</p>
+
+          {% endfor %}
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+{% endblock %}

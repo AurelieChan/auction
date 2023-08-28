@@ -1,0 +1,90 @@
+{% load static %}
+
+{% load custom_filters %}
+
+{% get_category_names as category_names %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>{% block title %}{% endblock %}</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?&family=Monoton&family=Ranchers:wght@400&family=Nova+Mono&display=swap" rel="stylesheet">
+
+    <link rel="icon" type="image/x-icon" href="{% static 'auctions/favicon.ico' %}">
+    <link href="{% static 'auctions/styles.css' %}" rel="stylesheet">
+
+    <script src="https://kit.fontawesome.com/75922aa512.js" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  </head>
+  <body>
+
+    <div class="titles">
+
+      <div  class='titlebar'>
+        <h1>Oldiction</h1>
+        <p class='hippy-title'>&#127804; Sell and buy stuffs from the 60's and 70's &#127804;</p>
+      </div>
+
+      <div class="navibar">
+        <p class="bright-text">
+          {% if user.is_authenticated %}
+            Signed in as <strong>{{ user.username }}</strong>.
+          {% else %}
+            Not signed in.
+          {% endif %}
+        </p>
+      </div>
+        <ul class="nav">
+          <li class="nav-item">
+              <a class="nav-link" href="{% url 'index' %}">All Listings</a>
+          </li>
+          {% if user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'create' %}">Create Listing</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'mylistings' %}">My Listings</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'watchlist' %}">My Watchlist</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'auctions_won' %}">Auctions Won</a>
+            </li>
+          {% endif %}
+            <li class="nav-item dropdown">
+              <div class="nav-link dropdown dropdown-category">Search by Category</div>
+              <div class="dropdown-content">
+                {% for categoryName in category_names %}
+                <a class="nav-link" href="{% url 'searchByCategory' categoryName %}">{{ categoryName }}</a>
+                {% endfor %}
+              </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'about' %}">About</a>
+            </li>
+          {% if user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
+            </li>
+          {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'login' %}">Log In</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'register' %}">Register</a>
+            </li>
+          {% endif %}
+        </ul>
+      </div>
+
+    {% block body %}
+    {% endblock %}
+
+  </body>
+</html>

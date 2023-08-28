@@ -1,0 +1,31 @@
+{% extends "auctions/layout.html" %}
+
+{% block title %}
+  Oldiction | Login
+{% endblock %}
+
+{% block body %}
+
+  <h2>Login</h2>
+
+  <div class="spacing-startblock"></div>
+
+  {% if message %}
+    <p>{{ message }}</p>
+  {% endif %}
+
+  <form action="{% url 'login' %}" method="post">
+
+    {% csrf_token %}
+    <input autofocus class="space-top" type="text" name="username" placeholder="Username">
+    <input class="space" type="password" name="password" placeholder="Password">
+
+    <div>
+      <button type="submit">Login</button>
+    </div>
+
+  </form>
+
+  <p>Don't have an account? <a href="{% url 'register' %}">Register here.</a></p>
+
+{% endblock %}

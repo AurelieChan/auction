@@ -1,0 +1,54 @@
+{% extends "auctions/layout.html" %}
+
+{% load static %}
+
+{% block title %}
+  Oldiction | Create
+{% endblock %}
+
+{% block body %}
+
+  <h2>Create a New Listing</h2>
+
+  <div class="spacing-startblock"></div>
+  <br>
+
+  {% if message %}
+    <p>{{ message }}</p>
+  {% endif %}
+
+  <form method="POST" action="{% url 'create' %}">
+    {% csrf_token %}
+
+    {# {{ listing_form }} #}
+    {{ listing_form.non_field_errors }}
+      <div>
+        {{ listing_form.title }}
+      </div>
+      <div>
+        {{ listing_form.description }}
+      </div>
+      <div>
+        {{ listing_form.picture.errors }}
+        {{ listing_form.picture }}
+      </div>
+      <div>
+        {{ listing_form.bid.errors }}
+        {{ listing_form.bid }}
+      </div>
+      <div>
+        <div>
+          {{ listing_form.category.errors }}
+        </div>
+        <div class="custom-select">
+          {{ listing_form.category }}
+        </div>
+      </div>
+    <div>
+      <button type="submit">Save</button>
+    </div>
+  </form>
+
+  <script src="{% static 'auctions/customselect.js' %}"></script>
+
+{% endblock %}

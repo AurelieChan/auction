@@ -1,0 +1,57 @@
+{% extends "auctions/layout.html" %}
+
+{% load custom_filters %}
+
+{% block title %}
+  Oldiction | Active Listings
+{% endblock %}
+
+{% block body %}
+  <h2>{{ page_name }}</h2>
+
+  <div class="spacing-startblock"></div>
+
+    {% for listing in activeListings %}
+
+    <a href="{% url 'listing' listing.id %}">
+      <div class="mini-container">
+
+          <div>
+            <h3>
+              {{ listing.title }}
+              {% if user.is_authenticated %}
+
+                {% if listing.winner and listing.winner == user %}
+                  <i id='icon' class='fas fa-star'></i>
+                {% elif listing in listingsByUser %}
+                  <i class='fas fa-heart blue'></i>
+                {% elif current_user in listing.watchedby.all %}
+                  <i class='fas fa-heart'></i>
+                {% else %}
+                  <i class='far fa-heart'></i>
+                {% endif %}
+
+              {% else %}
+                <i class='far fa-heart'></i>
+              {% endif %}
+            </h3>
+
+            <p>{{ listing.description }}</p>
+            <p>
+              <b class="mini-titles">Category:</b> {{ fullNameCategory|get_category:listing.category }}
+              <b class="mini-titles">Current price: </b>US ${{ listing.currentBid }}
+            </p>
+          </div>
+
+          <div>
+            {% if listing.picture %}
+              <img src="{{ listing.picture }}" class="MiniImgListing">
+            {% endif %}
+          </div>
+
+      </div>
+    </a>
+
+    {% endfor %}
+
+{% endblock %}
